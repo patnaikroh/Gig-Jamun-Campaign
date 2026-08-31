@@ -125,8 +125,8 @@
   h1.headline {
     font-family: "Fraunces", Georgia, serif;
     font-weight: 900;
-    font-size: clamp(32px, 9vw, 42px);
-    line-height: 1.03;
+    font-size: clamp(24px, 6.4vw, 32px);
+    line-height: 1.12;
     margin: 0 0 10px;
     text-wrap: balance;
     letter-spacing: -0.01em;
@@ -146,18 +146,22 @@
   .prize-pill {
     margin-top: 18px;
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
+    max-width: 34ch;
     background: rgba(251,243,234,0.12);
     border: 1px solid rgba(251,243,234,0.28);
-    padding: 8px 14px 8px 10px;
-    border-radius: 999px;
+    padding: 10px 14px;
+    border-radius: 14px;
     font-size: 13px;
     font-weight: 600;
+    line-height: 1.35;
     color: #FBF3EA;
   }
   .prize-pill .dot {
     width: 8px; height: 8px; border-radius: 50%;
+    margin-top: 5px;
+    flex: none;
     background: var(--gold-2);
     box-shadow: 0 0 0 4px rgba(228,182,91,0.22);
   }
@@ -461,9 +465,9 @@
       GIG&nbsp;JAMUN
     </span>
     <div class="eyebrow">Consumer Lucky Draw</div>
-    <h1 class="headline">Buy a bottle.<br>Win <em>big.</em></h1>
+    <h1 class="headline">Buy a bottle.<br>Win a couple entry ticket to <em>A R Rahman Concert</em> on 3rd October 2026.</h1>
     <p class="tagline">Scan, snap your bill, and you're in the draw — every genuine purchase gets an entry.</p>
-    <span class="prize-pill"><span class="dot"></span> Prize &amp; draw date to be announced</span>
+    <span class="prize-pill"><span class="dot"></span> Lucky draw results to be announced on 1st October 2026</span>
   </div>
 </header>
 
@@ -502,12 +506,6 @@
           <div class="err-msg" id="err-email">Please enter a valid email address.</div>
         </label>
 
-        <label class="field">
-          <span class="lab">City</span>
-          <input type="text" id="city" name="city" autocomplete="address-level2" placeholder="Where you bought it" required />
-          <div class="err-msg" id="err-city">Please enter your city.</div>
-        </label>
-
         <label class="field" style="margin-bottom:6px;">
           <span class="lab">Invoice photo</span>
           <div class="photo-drop" id="photoDrop">
@@ -535,15 +533,14 @@
     <div class="ticket-foot form-view" id="formFoot">
       <div class="tnc">
         <input type="checkbox" id="agree" />
-        <span class="tnc-text">I confirm I am 18 years or older and I agree to the <a href="#tncDetails">Contest Terms &amp; Conditions</a>.</span>
+        <span class="tnc-text">I confirm I am 21 years or older and I agree to the <a href="#tncDetails">Contest Terms &amp; Conditions</a>.</span>
       </div>
       <div class="err-msg" id="err-agree">Please accept the Terms &amp; Conditions to continue.</div>
 
       <details class="tnc-details" id="tncDetails">
         <summary>View Contest Terms &amp; Conditions</summary>
         <div id="tncBody">
-          <!-- PLACEHOLDER — replace with the final approved contest T&Cs -->
-          <p><strong>[Placeholder — replace with final T&amp;Cs]</strong> One entry per invoice. Invoice must show purchase of a GIG Jamun bottle from a participating outlet, dated within the campaign period. Entrants must be 18+ and resident in India. Winner(s) selected by random draw and contacted via the mobile number / email provided. No purchase necessary clause, prize details, draw date, and full eligibility rules to be added here before this page goes live.</p>
+          <p>One entry per invoice. Invoice must show purchase of a GIG Jamun bottle from a participating outlet, dated within the campaign period. Entrants must be 21+ and resident in India. Winner(s) selected by random draw and contacted via the mobile number / email provided.</p>
         </div>
       </details>
 
@@ -561,8 +558,8 @@
       <div class="success-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg>
       </div>
-      <h2>You're in the draw!</h2>
-      <p>Keep this entry code for your records. We'll contact winners using the details you shared.</p>
+      <h2>You're In!</h2>
+      <p>Thank you for participating in the A R Rahman Contest. Winners list will be announced on 1st October 2026.</p>
       <div class="entry-code" id="entryCode">GJ-XXXXXXXX</div>
       <div class="success-note">Didn't mean to submit twice? Each invoice should only be entered once — see the Terms &amp; Conditions.</div>
     </div>
@@ -571,7 +568,7 @@
 </div>
 
 <footer class="legal">
-  GIG Jamun Lucky Draw is open to participating outlets only. Full Terms &amp; Conditions apply — see above. This is not a game of chance in violation of applicable law; entrants must be 18+.
+  GIG Jamun Lucky Draw is open to participating outlets only. Full Terms &amp; Conditions apply — see above. This is not a game of chance in violation of applicable law; entrants must be 21+.
 </footer>
 
 <script>
@@ -590,7 +587,6 @@
     name: document.getElementById('name'),
     mobile: document.getElementById('mobile'),
     email: document.getElementById('email'),
-    city: document.getElementById('city'),
     photoInput: document.getElementById('invoicePhoto'),
     photoDrop: document.getElementById('photoDrop'),
     photoEmpty: document.getElementById('photoEmpty'),
@@ -659,9 +655,6 @@
     if (!emailOk) { showErr('email', true); els.email.classList.add('invalid'); ok = false; }
     else { showErr('email', false); els.email.classList.remove('invalid'); }
 
-    if (!els.city.value.trim()) { showErr('city', true); els.city.classList.add('invalid'); ok = false; }
-    else { showErr('city', false); els.city.classList.remove('invalid'); }
-
     if (!compressedImage) { showErr('photo', true); ok = false; }
 
     if (!els.agree.checked) { showErr('agree', true); ok = false; }
@@ -696,7 +689,6 @@
       name: els.name.value.trim(),
       mobile: els.mobile.value.replace(/\D/g, ''),
       email: els.email.value.trim(),
-      city: els.city.value.trim(),
       imageBase64: compressedImage.base64,
       imageType: compressedImage.type,
       imageName: compressedImage.name
