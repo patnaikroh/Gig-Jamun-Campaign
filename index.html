@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>GIG Jamun Lucky Draw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     GIG Jamun Lucky Draw — mobile registration page
+     ------------------------------------------------------------
+     THINGS TO CUSTOMIZE BEFORE GOING LIVE:
+     1. SCRIPT_URL (bottom of <script>) — your Apps Script Web App URL.
+     2. Brand colors below (--jamun / --magenta / --gold / --cream) —
+        swap for official GIG Jamun brand colors once shared.
+     3. .logo-mark — swap the placeholder wordmark for the real logo.
+     4. #tncBody — replace placeholder terms with the final contest T&Cs.
+     5. Prize / draw-date copy in the hero and terms section.
+     ============================================================ */
+
+  :root {
+    --ink:      #221019;
+    --plum:     #3D1638;
+    --jamun:    #6E1F49;
+    --magenta:  #C22A6D;
+    --magenta-2:#A81F5C;
+    --gold:     #C6963C;
+    --gold-2:   #E4B65B;
+    --cream:    #FBF3EA;
+    --cream-2:  #F3E3D6;
+    --card:     #FFFFFF;
+    --line:     rgba(34,16,25,0.14);
+    --text:     var(--ink);
+    --text-soft:#6B5761;
+    --success:  #2E7D4F;
+    --error:    #B4223A;
+    --bg: var(--cream);
+    --shadow: 0 18px 40px -20px rgba(61,22,56,0.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1A0E17;
+      --card: #241220;
+      --ink: #F6EAEF;
+      --text: #F3E7EE;
+      --text-soft: #C7AFBC;
+      --line: rgba(246,234,239,0.14);
+      --cream-2: #2E1728;
+      --shadow: 0 18px 40px -18px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1A0E17;
+    --card: #241220;
+    --ink: #F6EAEF;
+    --text: #F3E7EE;
+    --text-soft: #C7AFBC;
+    --line: rgba(246,234,239,0.14);
+    --cream-2: #2E1728;
+    --shadow: 0 18px 40px -18px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Work Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    padding-bottom: 48px;
+  }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background:
+      radial-gradient(120% 90% at 15% -10%, rgba(230,182,91,0.35), transparent 55%),
+      linear-gradient(160deg, var(--plum), var(--jamun) 65%, var(--magenta-2));
+    color: #FBF3EA;
+    padding: 28px 20px 34px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    right: -60px; bottom: -80px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(196,42,109,0.55), transparent 70%);
+  }
+  .hero-inner { max-width: 480px; margin: 0 auto; position: relative; }
+  .logo-mark {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: "Space Mono", monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-2);
+  }
+  .logo-mark svg { width: 16px; height: 16px; flex: none; }
+
+  .eyebrow {
+    margin: 18px 0 6px;
+    font-size: 12.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(251,243,234,0.75);
+    font-weight: 600;
+  }
+  h1.headline {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 900;
+    font-size: clamp(32px, 9vw, 42px);
+    line-height: 1.03;
+    margin: 0 0 10px;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  h1.headline em {
+    font-style: italic;
+    font-weight: 600;
+    color: var(--gold-2);
+  }
+  .tagline {
+    font-size: 15.5px;
+    color: rgba(251,243,234,0.88);
+    max-width: 34ch;
+    margin: 0;
+  }
+
+  .prize-pill {
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(251,243,234,0.12);
+    border: 1px solid rgba(251,243,234,0.28);
+    padding: 8px 14px 8px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #FBF3EA;
+  }
+  .prize-pill .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold-2);
+    box-shadow: 0 0 0 4px rgba(228,182,91,0.22);
+  }
+
+  /* ---------- Steps ---------- */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: -22px 0 0;
+    padding: 16px 14px;
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 2;
+  }
+  .step { text-align: center; }
+  .step .n {
+    width: 26px; height: 26px;
+    margin: 0 auto 6px;
+    border-radius: 50%;
+    background: var(--cream-2);
+    color: var(--jamun);
+    font-family: "Space Mono", monospace;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-soft);
+    letter-spacing: 0.01em;
+  }
+
+  /* ---------- Section heads ---------- */
+  .section-head {
+    margin: 34px 0 4px;
+  }
+  .section-head .kicker {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--magenta);
+  }
+  .section-head h2 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 700;
+    font-size: 22px;
+    margin: 4px 0 0;
+  }
+
+  /* ---------- Ticket card / form ---------- */
+  .ticket {
+    margin-top: 16px;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .ticket-body { padding: 22px 20px 8px; }
+
+  label.field {
+    display: block;
+    margin-bottom: 16px;
+  }
+  label.field .lab {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+  input[type="text"], input[type="tel"], input[type="email"] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s ease;
+  }
+  input:focus { border-color: var(--magenta); }
+  input.invalid { border-color: var(--error); }
+  .err-msg {
+    display: none;
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 5px;
+    font-weight: 600;
+  }
+  .err-msg.show { display: block; }
+
+  /* photo upload */
+  .photo-drop {
+    border: 1.5px dashed var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--bg);
+    transition: border-color .15s ease, background .15s ease;
+    position: relative;
+  }
+  .photo-drop:active { background: var(--cream-2); }
+  .photo-drop.has-image { border-style: solid; padding: 10px; }
+  .photo-drop input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+  .photo-drop .ph-icon {
+    width: 34px; height: 34px; margin: 0 auto 8px;
+    color: var(--magenta);
+  }
+  .photo-drop .ph-text { font-weight: 600; font-size: 14px; }
+  .photo-drop .ph-sub { font-size: 12.5px; color: var(--text-soft); margin-top: 2px; }
+  .photo-preview {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+  }
+  .photo-preview.show { display: flex; }
+  .photo-preview img {
+    width: 56px; height: 56px; object-fit: cover;
+    border-radius: 8px; flex: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .photo-preview .pv-name { font-weight: 600; font-size: 13.5px; }
+  .photo-preview .pv-sub { font-size: 12px; color: var(--magenta); font-weight: 600; margin-top: 2px; }
+
+  /* terms */
+  .tnc {
+    margin: 18px 0 4px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .tnc input[type="checkbox"] {
+    width: 19px; height: 19px; flex: none; margin-top: 1px;
+    accent-color: var(--magenta);
+  }
+  .tnc .tnc-text { font-size: 13px; color: var(--text-soft); }
+  .tnc .tnc-text a { color: var(--magenta); font-weight: 600; text-decoration: underline; }
+
+  details.tnc-details {
+    margin: 10px 0 18px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+  details.tnc-details summary {
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-soft);
+  }
+  #tncBody {
+    font-size: 12.5px;
+    color: var(--text-soft);
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+  #tncBody p { margin: 0 0 8px; }
+
+  /* perforation */
+  .perf {
+    height: 0;
+    border-top: 2px dashed var(--line);
+    position: relative;
+    margin: 0 -20px;
+  }
+  .perf::before, .perf::after {
+    content: "";
+    position: absolute;
+    top: -9px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .perf::before { left: -9px; }
+  .perf::after { right: -9px; }
+
+  .ticket-foot { padding: 18px 20px 22px; }
+
+  button.submit {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 18px;
+    font-family: inherit;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: #FBF3EA;
+    background: linear-gradient(135deg, var(--magenta), var(--magenta-2));
+    box-shadow: 0 10px 22px -10px rgba(194,42,109,0.6);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform .08s ease, opacity .15s ease;
+  }
+  button.submit:active { transform: scale(0.98); }
+  button.submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  button.submit svg { width: 18px; height: 18px; }
+
+  .form-msg {
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-top: 10px;
+    display: none;
+  }
+  .form-msg.show { display: block; }
+  .form-msg.error { color: var(--error); }
+
+  /* spinner */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(251,243,234,0.4);
+    border-top-color: #FBF3EA;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .submitting .spinner { display: inline-block; }
+  .submitting .btn-label { display: none; }
+
+  /* ---------- Success state ---------- */
+  .success-view { display: none; text-align: center; padding: 30px 8px 10px; }
+  .success-view.show { display: block; }
+  .form-view.hide { display: none; }
+  .success-badge {
+    width: 64px; height: 64px; margin: 0 auto 16px;
+    border-radius: 50%;
+    background: var(--cream-2);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .success-badge svg { width: 30px; height: 30px; color: var(--success); }
+  .success-view h2 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 800;
+    font-size: 24px;
+    margin: 0 0 8px;
+  }
+  .success-view p { color: var(--text-soft); font-size: 14px; margin: 0 0 20px; }
+  .entry-code {
+    display: inline-block;
+    font-family: "Space Mono", monospace;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    background: var(--cream-2);
+    color: var(--jamun);
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1.5px dashed var(--magenta);
+  }
+  .success-note {
+    margin-top: 22px;
+    font-size: 12.5px;
+    color: var(--text-soft);
+  }
+
+  /* ---------- Setup warning (only shows if SCRIPT_URL not set) ---------- */
+  .setup-warning {
+    display: none;
+    background: #7A1F1F;
+    color: #FBEAEA;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: center;
+    padding: 10px 16px;
+  }
+  .setup-warning.show { display: block; }
+
+  footer.legal {
+    max-width: 480px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+    font-size: 11.5px;
+    color: var(--text-soft);
+    text-align: center;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div id="setupWarning" class="setup-warning">
+  ⚠ Setup needed: paste your Apps Script Web App URL into SCRIPT_URL in this file before sharing this page.
+</div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c3 3 6 6.2 6 10.2A6 6 0 0 1 6 12.2C6 8.2 9 5 12 2z"/></svg>
+      GIG&nbsp;JAMUN
+    </span>
+    <div class="eyebrow">Consumer Lucky Draw</div>
+    <h1 class="headline">Buy a bottle.<br>Win <em>big.</em></h1>
+    <p class="tagline">Scan, snap your bill, and you're in the draw — every genuine purchase gets an entry.</p>
+    <span class="prize-pill"><span class="dot"></span> Prize &amp; draw date to be announced</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="steps">
+    <div class="step"><div class="n">1</div><div class="label">Buy a bottle</div></div>
+    <div class="step"><div class="n">2</div><div class="label">Scan QR</div></div>
+    <div class="step"><div class="n">3</div><div class="label">Upload bill</div></div>
+    <div class="step"><div class="n">4</div><div class="label">Win</div></div>
+  </div>
+
+  <div class="section-head">
+    <div class="kicker">Step 3 of 4</div>
+    <h2>Enter your details</h2>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-body form-view" id="formView">
+      <form id="entryForm" novalidate>
+        <label class="field">
+          <span class="lab">Full name</span>
+          <input type="text" id="name" name="name" autocomplete="name" placeholder="As on your invoice" required />
+          <div class="err-msg" id="err-name">Please enter your name.</div>
+        </label>
+
+        <label class="field">
+          <span class="lab">Mobile number</span>
+          <input type="tel" id="mobile" name="mobile" autocomplete="tel" inputmode="numeric" placeholder="10-digit mobile number" required />
+          <div class="err-msg" id="err-mobile">Please enter a valid 10-digit mobile number.</div>
+        </label>
+
+        <label class="field">
+          <span class="lab">Email address</span>
+          <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required />
+          <div class="err-msg" id="err-email">Please enter a valid email address.</div>
+        </label>
+
+        <label class="field">
+          <span class="lab">City</span>
+          <input type="text" id="city" name="city" autocomplete="address-level2" placeholder="Where you bought it" required />
+          <div class="err-msg" id="err-city">Please enter your city.</div>
+        </label>
+
+        <label class="field" style="margin-bottom:6px;">
+          <span class="lab">Invoice photo</span>
+          <div class="photo-drop" id="photoDrop">
+            <input type="file" id="invoicePhoto" accept="image/*" capture="environment" />
+            <div id="photoEmpty">
+              <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8a2 2 0 0 1 2-2h1.2l.9-1.4A1 1 0 0 1 8.9 4h6.2a1 1 0 0 1 .84.46L16.8 6H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.4"/></svg>
+              <div class="ph-text">Tap to photograph your invoice</div>
+              <div class="ph-sub">or choose from your gallery</div>
+            </div>
+            <div class="photo-preview" id="photoPreview">
+              <img id="photoThumb" alt="Invoice preview" />
+              <div>
+                <div class="pv-name" id="photoFileName">invoice.jpg</div>
+                <div class="pv-sub">Tap to replace</div>
+              </div>
+            </div>
+          </div>
+          <div class="err-msg" id="err-photo">Please add a photo of your invoice.</div>
+        </label>
+      </form>
+    </div>
+
+    <div class="perf"></div>
+
+    <div class="ticket-foot form-view" id="formFoot">
+      <div class="tnc">
+        <input type="checkbox" id="agree" />
+        <span class="tnc-text">I confirm I am 18 years or older and I agree to the <a href="#tncDetails">Contest Terms &amp; Conditions</a>.</span>
+      </div>
+      <div class="err-msg" id="err-agree">Please accept the Terms &amp; Conditions to continue.</div>
+
+      <details class="tnc-details" id="tncDetails">
+        <summary>View Contest Terms &amp; Conditions</summary>
+        <div id="tncBody">
+          <!-- PLACEHOLDER — replace with the final approved contest T&Cs -->
+          <p><strong>[Placeholder — replace with final T&amp;Cs]</strong> One entry per invoice. Invoice must show purchase of a GIG Jamun bottle from a participating outlet, dated within the campaign period. Entrants must be 18+ and resident in India. Winner(s) selected by random draw and contacted via the mobile number / email provided. No purchase necessary clause, prize details, draw date, and full eligibility rules to be added here before this page goes live.</p>
+        </div>
+      </details>
+
+      <button type="button" class="submit" id="submitBtn">
+        <span class="spinner"></span>
+        <span class="btn-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          Submit My Entry
+        </span>
+      </button>
+      <div class="form-msg" id="formMsg"></div>
+    </div>
+
+    <div class="success-view" id="successView">
+      <div class="success-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg>
+      </div>
+      <h2>You're in the draw!</h2>
+      <p>Keep this entry code for your records. We'll contact winners using the details you shared.</p>
+      <div class="entry-code" id="entryCode">GJ-XXXXXXXX</div>
+      <div class="success-note">Didn't mean to submit twice? Each invoice should only be entered once — see the Terms &amp; Conditions.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="legal">
+  GIG Jamun Lucky Draw is open to participating outlets only. Full Terms &amp; Conditions apply — see above. This is not a game of chance in violation of applicable law; entrants must be 18+.
+</footer>
+
+<script>
+(function () {
+  // ---- CONFIGURE THIS -----------------------------------------------
+  // Paste the Google Apps Script "Web app URL" here after deploying
+  // apps-script.gs (see instructions at the top of that file).
+  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxD7K8WHcwPQS2gdM9DDr0U7eZRXZadQrR_RP_00SmpJ8kWQezYkpg-cTItxxKPOiBH6A/exec";
+  // ---------------------------------------------------------------------
+
+  if (!SCRIPT_URL) {
+    document.getElementById('setupWarning').classList.add('show');
+  }
+
+  var els = {
+    name: document.getElementById('name'),
+    mobile: document.getElementById('mobile'),
+    email: document.getElementById('email'),
+    city: document.getElementById('city'),
+    photoInput: document.getElementById('invoicePhoto'),
+    photoDrop: document.getElementById('photoDrop'),
+    photoEmpty: document.getElementById('photoEmpty'),
+    photoPreview: document.getElementById('photoPreview'),
+    photoThumb: document.getElementById('photoThumb'),
+    photoFileName: document.getElementById('photoFileName'),
+    agree: document.getElementById('agree'),
+    submitBtn: document.getElementById('submitBtn'),
+    formMsg: document.getElementById('formMsg'),
+    formView: document.getElementById('formView'),
+    formFoot: document.getElementById('formFoot'),
+    successView: document.getElementById('successView'),
+    entryCode: document.getElementById('entryCode')
+  };
+
+  var compressedImage = null; // { base64, type, name }
+
+  function showErr(id, show) {
+    var el = document.getElementById('err-' + id);
+    if (el) el.classList.toggle('show', !!show);
+  }
+
+  els.photoInput.addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    showErr('photo', false);
+
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var img = new Image();
+      img.onload = function () {
+        var maxDim = 1400;
+        var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+        var base64 = dataUrl.split(',')[1];
+
+        compressedImage = { base64: base64, type: 'image/jpeg', name: (file.name || 'invoice.jpg').replace(/\.[^.]+$/, '.jpg') };
+
+        els.photoThumb.src = dataUrl;
+        els.photoFileName.textContent = file.name || 'invoice.jpg';
+        els.photoEmpty.style.display = 'none';
+        els.photoPreview.classList.add('show');
+        els.photoDrop.classList.add('has-image');
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function validate() {
+    var ok = true;
+
+    if (!els.name.value.trim()) { showErr('name', true); els.name.classList.add('invalid'); ok = false; }
+    else { showErr('name', false); els.name.classList.remove('invalid'); }
+
+    var mobileDigits = els.mobile.value.replace(/\D/g, '');
+    if (mobileDigits.length !== 10) { showErr('mobile', true); els.mobile.classList.add('invalid'); ok = false; }
+    else { showErr('mobile', false); els.mobile.classList.remove('invalid'); }
+
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(els.email.value.trim());
+    if (!emailOk) { showErr('email', true); els.email.classList.add('invalid'); ok = false; }
+    else { showErr('email', false); els.email.classList.remove('invalid'); }
+
+    if (!els.city.value.trim()) { showErr('city', true); els.city.classList.add('invalid'); ok = false; }
+    else { showErr('city', false); els.city.classList.remove('invalid'); }
+
+    if (!compressedImage) { showErr('photo', true); ok = false; }
+
+    if (!els.agree.checked) { showErr('agree', true); ok = false; }
+    else { showErr('agree', false); }
+
+    return ok;
+  }
+
+  function setMsg(text, isError) {
+    els.formMsg.textContent = text || '';
+    els.formMsg.classList.toggle('show', !!text);
+    els.formMsg.classList.toggle('error', !!isError);
+  }
+
+  function genEntryId() {
+    return 'GJ-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
+  }
+
+  els.submitBtn.addEventListener('click', function () {
+    if (!SCRIPT_URL) {
+      setMsg('This page is not fully set up yet — the campaign owner needs to add the backend link.', true);
+      return;
+    }
+    if (!validate()) {
+      setMsg('Please check the highlighted fields above.', true);
+      return;
+    }
+
+    var entryId = genEntryId();
+    var payload = {
+      entryId: entryId,
+      name: els.name.value.trim(),
+      mobile: els.mobile.value.replace(/\D/g, ''),
+      email: els.email.value.trim(),
+      city: els.city.value.trim(),
+      imageBase64: compressedImage.base64,
+      imageType: compressedImage.type,
+      imageName: compressedImage.name
+    };
+
+    els.submitBtn.disabled = true;
+    els.submitBtn.classList.add('submitting');
+    setMsg('', false);
+
+    // NOTE: no custom headers are set on purpose — this keeps the request
+    // a "simple" cross-origin POST so the browser doesn't need CORS
+    // preflight, which Apps Script web apps don't handle. Do not add a
+    // 'Content-Type: application/json' header here.
+    fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data && data.ok) {
+          els.entryCode.textContent = data.entryId || entryId;
+          els.formView.classList.add('hide');
+          els.formFoot.classList.add('hide');
+          els.successView.classList.add('show');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          throw new Error((data && data.error) || 'Submission failed');
+        }
+      })
+      .catch(function (err) {
+        setMsg("Couldn't submit — check your connection and try again.", true);
+      })
+      .finally(function () {
+        els.submitBtn.disabled = false;
+        els.submitBtn.classList.remove('submitting');
+      });
+  });
+})();
+</script>
+</body>
+</html>
